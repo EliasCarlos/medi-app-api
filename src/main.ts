@@ -1,6 +1,6 @@
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
-import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { Env } from './shared/config/env.schema';
 
@@ -16,4 +16,8 @@ async function bootstrap() {
 
   await app.listen(port);
 }
-bootstrap();
+
+bootstrap().catch((error) => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});

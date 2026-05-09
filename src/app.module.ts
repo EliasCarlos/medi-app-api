@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { validateEnv } from './shared/config/env.config';
-import { PrismaModule } from './shared/database/prisma.module';
-import { LoggerModule } from './shared/logger/logger.module';
+import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { validateEnv } from './shared/config/env.config';
+import { PrismaModule } from './shared/database/prisma.module';
+import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
+import { LoggerModule } from './shared/logger/logger.module';
 
 @Module({
   imports: [
@@ -16,6 +18,12 @@ import { AppService } from './app.service';
     LoggerModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}
