@@ -20,7 +20,7 @@ import { UpdateDoctorDto } from '../dto/update-doctor.dto';
 import { DoctorEntity } from '../entities/doctor.entity';
 import { DoctorsService } from '../services/doctors.service';
 
-@ApiTags('doctors')
+@ApiTags('Doctors')
 @Controller('doctors')
 export class DoctorsController {
   constructor(private readonly doctorsService: DoctorsService) {}

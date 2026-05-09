@@ -19,7 +19,7 @@ import { CreatePatientDto } from '../dto/create-patient.dto';
 import { UpdatePatientDto } from '../dto/update-patient.dto';
 import { PatientsService } from '../services/patients.service';
 
-@ApiTags('patients')
+@ApiTags('Patients')
 @Controller('patients')
 export class PatientsController {
   constructor(private readonly patientsService: PatientsService) {}
