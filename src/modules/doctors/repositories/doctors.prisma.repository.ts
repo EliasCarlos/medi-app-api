@@ -1,23 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from '../../../shared/database/prisma.service';
-import { PatientEntity } from '../entities/patient.entity';
+import { PrismaService } from 'src/shared/database/prisma.service';
+import { DoctorEntity } from '../entities/doctor.entity';
 import {
-  CreatePatientProfileData,
-  IPatientsRepository,
-} from '../interfaces/patients.repository.interface';
+  CreateDoctorProfileData,
+  IDoctorsRepository,
+} from '../interfaces/doctors.respository.interface';
 
 @Injectable()
-export class PatientsPrismaRepository implements IPatientsRepository {
+export class DoctorsPrismaRepository implements IDoctorsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(
-    data: CreatePatientProfileData,
+    data: CreateDoctorProfileData,
     tx?: Prisma.TransactionClient,
-  ): Promise<PatientEntity> {
+  ): Promise<DoctorEntity> {
     const client = tx || this.prisma;
 
-    const patient = await client.patientProfile.create({
+    const doctor = await client.doctorProfile.create({
       data,
       include: {
         user: {
@@ -33,17 +33,17 @@ export class PatientsPrismaRepository implements IPatientsRepository {
       },
     });
 
-    return new PatientEntity(patient);
+    return new DoctorEntity(doctor);
   }
 
-  async findByCpf(
-    cpf: string,
+  async findByCrm(
+    crm: string,
     tx?: Prisma.TransactionClient,
-  ): Promise<PatientEntity | null> {
+  ): Promise<DoctorEntity | null> {
     const client = tx || this.prisma;
 
-    const patient = await client.patientProfile.findUnique({
-      where: { cpf },
+    const doctor = await client.doctorProfile.findUnique({
+      where: { crm },
       include: {
         user: {
           select: {
@@ -58,13 +58,13 @@ export class PatientsPrismaRepository implements IPatientsRepository {
       },
     });
 
-    if (!patient) return null;
+    if (!doctor) return null;
 
-    return new PatientEntity(patient);
+    return new DoctorEntity(doctor);
   }
 
-  async findAll(): Promise<PatientEntity[]> {
-    const patients = await this.prisma.patientProfile.findMany({
+  async findAll(): Promise<DoctorEntity[]> {
+    const doctors = await this.prisma.doctorProfile.findMany({
       where: {
         user: { deletedAt: null },
       },
@@ -82,12 +82,12 @@ export class PatientsPrismaRepository implements IPatientsRepository {
       },
     });
 
-    return patients.map((patient) => new PatientEntity(patient));
+    return doctors.map((doctor) => new DoctorEntity(doctor));
   }
 
-  async findById(id: string): Promise<PatientEntity | null> {
-    const patient = await this.prisma.patientProfile.findUnique({
-      where: { id, user: { deletedAt: null } },
+  async findById(id: string): Promise<DoctorEntity | null> {
+    const doctor = await this.prisma.doctorProfile.findUnique({
+      where: { id },
       include: {
         user: {
           select: {
@@ -102,19 +102,19 @@ export class PatientsPrismaRepository implements IPatientsRepository {
       },
     });
 
-    if (!patient) return null;
+    if (!doctor || doctor.user?.deletedAt) return null;
 
-    return new PatientEntity(patient);
+    return new DoctorEntity(doctor);
   }
 
   async update(
     id: string,
-    data: Partial<CreatePatientProfileData>,
+    data: Partial<CreateDoctorProfileData>,
     tx?: Prisma.TransactionClient,
-  ): Promise<PatientEntity> {
+  ): Promise<DoctorEntity> {
     const client = tx || this.prisma;
 
-    const patient = await client.patientProfile.update({
+    const doctor = await client.doctorProfile.update({
       where: { id },
       data,
       include: {
@@ -131,18 +131,18 @@ export class PatientsPrismaRepository implements IPatientsRepository {
       },
     });
 
-    return new PatientEntity(patient);
+    return new DoctorEntity(doctor);
   }
 
   async delete(id: string): Promise<void> {
-    const patient = await this.prisma.patientProfile.findUnique({
+    const doctor = await this.prisma.doctorProfile.findUnique({
       where: { id },
       select: { userId: true },
     });
 
-    if (patient) {
+    if (doctor) {
       await this.prisma.user.update({
-        where: { id: patient.userId },
+        where: { id: doctor.userId },
         data: { deletedAt: new Date() },
       });
     }
