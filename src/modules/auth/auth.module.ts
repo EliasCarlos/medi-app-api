@@ -8,6 +8,7 @@ import { ISessionsRepository } from './interfaces/sessions.repository.interface'
 import { SessionsPrismaRepository } from './repositories/sessions.prisma.repository';
 import { AuthService } from './services/auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [HashingModule, UsersModule, PassportModule, JwtModule.register({})],
@@ -15,6 +16,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
   providers: [
     AuthService,
     JwtStrategy,
+    RolesGuard,
     {
       provide: ISessionsRepository,
       useClass: SessionsPrismaRepository,

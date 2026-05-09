@@ -9,12 +9,18 @@ import {
   Post,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { UseGuards } from '@nestjs/common';
+import { Role } from '@prisma/client';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { Roles } from '../../auth/decorators/roles.decorator';
 import { CreatePatientDto } from '../dto/create-patient.dto';
 import { UpdatePatientDto } from '../dto/update-patient.dto';
 import { PatientsService } from '../services/patients.service';
@@ -32,6 +38,9 @@ export class PatientsController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'List all patients' })
   @ApiOkResponse({ description: 'Return all patients' })
   async findAll() {
@@ -39,6 +48,9 @@ export class PatientsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.DOCTOR, Role.PATIENT)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get patient by ID' })
   @ApiOkResponse({ description: 'Return patient details' })
   async findOne(@Param('id') id: string) {
@@ -46,6 +58,9 @@ export class PatientsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.PATIENT)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update patient profile' })
   @ApiOkResponse({ description: 'Patient updated successfully' })
   async update(
@@ -56,7 +71,10 @@ export class PatientsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @HttpCode(204)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Soft delete patient' })
   @ApiNoContentResponse({ description: 'Patient successfully deleted' })
   async remove(@Param('id') id: string) {
