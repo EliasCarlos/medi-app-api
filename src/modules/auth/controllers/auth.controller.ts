@@ -3,19 +3,20 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpStatus,
   Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiCreatedResponse,
   ApiNoContentResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import type { Request } from 'express';
+import { ApiStandardResponse } from '../../../shared/decorators/api-standard-response.decorator';
+import { UserEntity } from '../../users/entities/user.entity';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { LoginDto } from '../dto/login.dto';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
@@ -28,8 +29,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'User login' })
-  @ApiCreatedResponse({ description: 'Returns access and refresh tokens' })
+  @ApiStandardResponse(Object)
   async login(@Body() loginDto: LoginDto, @Req() request: Request) {
     const ip = request.ip || 'unknown';
     const userAgent = request.headers['user-agent'] || 'unknown';
@@ -38,9 +40,9 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh tokens' })
-  @ApiOkResponse({ description: 'Returns new access and refresh tokens' })
+  @ApiStandardResponse(Object)
   async refresh(
     @Body() refreshTokenDto: RefreshTokenDto,
     @Req() request: Request,
@@ -57,7 +59,7 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'User logout' })
   @ApiNoContentResponse({ description: 'Session invalidated successfully' })
@@ -70,7 +72,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
-  @ApiOkResponse({ description: 'Returns current user data' })
+  @ApiStandardResponse(UserEntity)
   async getMe(@CurrentUser('sub') userId: string) {
     return this.authService.getMe(userId);
   }

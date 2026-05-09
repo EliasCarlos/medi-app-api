@@ -4,26 +4,26 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { UseGuards } from '@nestjs/common';
 import { Role } from '@prisma/client';
+import { ApiStandardResponse } from '../../../shared/decorators/api-standard-response.decorator';
+import { Roles } from '../../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
-import { Roles } from '../../auth/decorators/roles.decorator';
 import { CreatePatientDto } from '../dto/create-patient.dto';
 import { UpdatePatientDto } from '../dto/update-patient.dto';
 import { PatientEntity } from '../entities/patient.entity';
@@ -36,10 +36,7 @@ export class PatientsController {
 
   @Post()
   @ApiOperation({ summary: 'Register a new patient' })
-  @ApiCreatedResponse({
-    description: 'Patient successfully registered',
-    type: PatientEntity,
-  })
+  @ApiStandardResponse(PatientEntity)
   async create(@Body() createPatientDto: CreatePatientDto) {
     return this.patientsService.create(createPatientDto);
   }
@@ -49,10 +46,7 @@ export class PatientsController {
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List all patients' })
-  @ApiOkResponse({
-    description: 'Return all patients',
-    type: [PatientEntity],
-  })
+  @ApiStandardResponse(PatientEntity, true)
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   async findAll() {
@@ -64,10 +58,7 @@ export class PatientsController {
   @Roles(Role.ADMIN, Role.DOCTOR, Role.PATIENT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get patient by ID' })
-  @ApiOkResponse({
-    description: 'Return patient details',
-    type: PatientEntity,
-  })
+  @ApiStandardResponse(PatientEntity)
   @ApiNotFoundResponse({ description: 'Patient not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findOne(@Param('id') id: string) {
@@ -79,10 +70,7 @@ export class PatientsController {
   @Roles(Role.ADMIN, Role.PATIENT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update patient profile' })
-  @ApiOkResponse({
-    description: 'Patient updated successfully',
-    type: PatientEntity,
-  })
+  @ApiStandardResponse(PatientEntity)
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async update(
     @Param('id') id: string,
@@ -94,7 +82,7 @@ export class PatientsController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Soft delete patient' })
   @ApiNoContentResponse({ description: 'Patient successfully deleted' })

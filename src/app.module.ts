@@ -15,6 +15,7 @@ import { validateEnv } from './shared/config/env.config';
 import { PrismaModule } from './shared/database/prisma.module';
 import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
 import { LoggerModule } from './shared/logger/logger.module';
+import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
 
 @Module({
   imports: [
@@ -47,6 +48,10 @@ import { LoggerModule } from './shared/logger/logger.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
     },
   ],
 })
