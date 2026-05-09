@@ -10,6 +10,7 @@ export class UserEntity {
   role: Role;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date | null;
 
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);
