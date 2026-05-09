@@ -1,8 +1,13 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Module,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UsersModule } from './modules/users/users.module';
 import { validateEnv } from './shared/config/env.config';
 import { PrismaModule } from './shared/database/prisma.module';
 import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
@@ -16,6 +21,7 @@ import { LoggerModule } from './shared/logger/logger.module';
     }),
     PrismaModule,
     LoggerModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [
@@ -31,6 +37,10 @@ import { LoggerModule } from './shared/logger/logger.module';
         forbidNonWhitelisted: true,
         transform: true,
       }),
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
     },
   ],
 })
