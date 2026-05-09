@@ -27,7 +27,7 @@ services:
       - /usr/src/app/node_modules
     ports:
       - '${API_PORT:-3000}:${API_PORT:-3000}'
-    command: sh -c "yarn install && yarn start:dev"
+    command: sh -c "yarn install && npx prisma generate && yarn start:dev"
     depends_on:
       - postgres
     env_file:
