@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../shared/database/prisma.service';
 import { UserEntity } from '../entities/user.entity';
 import {
@@ -10,8 +11,13 @@ import {
 export class UsersPrismaRepository implements IUsersRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateUserData): Promise<UserEntity> {
-    const user = await this.prisma.user.create({
+  async create(
+    data: CreateUserData,
+    tx?: Prisma.TransactionClient,
+  ): Promise<UserEntity> {
+    const client = tx || this.prisma;
+
+    const user = await client.user.create({
       data,
       select: {
         id: true,
@@ -43,8 +49,13 @@ export class UsersPrismaRepository implements IUsersRepository {
     return new UserEntity(user);
   }
 
-  async findByEmail(email: string): Promise<UserEntity | null> {
-    const user = await this.prisma.user.findUnique({
+  async findByEmail(
+    email: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<UserEntity | null> {
+    const client = tx || this.prisma;
+
+    const user = await client.user.findUnique({
       where: { email, deletedAt: null },
       select: {
         id: true,
@@ -87,8 +98,14 @@ export class UsersPrismaRepository implements IUsersRepository {
     return users.map((user) => new UserEntity(user));
   }
 
-  async update(id: string, data: Partial<CreateUserData>): Promise<UserEntity> {
-    const user = await this.prisma.user.update({
+  async update(
+    id: string,
+    data: Partial<CreateUserData>,
+    tx?: Prisma.TransactionClient,
+  ): Promise<UserEntity> {
+    const client = tx || this.prisma;
+
+    const user = await client.user.update({
       where: { id, deletedAt: null },
       data,
       select: {

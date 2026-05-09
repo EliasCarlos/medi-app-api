@@ -8,6 +8,7 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './modules/users/users.module';
+import { PatientsModule } from './modules/patients/patients.module';
 import { validateEnv } from './shared/config/env.config';
 import { PrismaModule } from './shared/database/prisma.module';
 import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
@@ -22,6 +23,7 @@ import { LoggerModule } from './shared/logger/logger.module';
     PrismaModule,
     LoggerModule,
     UsersModule,
+    PatientsModule,
   ],
   controllers: [AppController],
   providers: [
